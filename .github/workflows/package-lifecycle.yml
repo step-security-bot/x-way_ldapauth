@@ -5,6 +5,9 @@ on:
   schedule:
     - cron: '14 0 * * 4'  # once per week
 
+permissions:
+  contents: read
+
 jobs:
   delete_packages:
     runs-on: ubuntu-latest
@@ -16,9 +19,14 @@ jobs:
         package: [ldapauth]
 
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@c6295a65d1254861815972266d5933fd6e532bdf # v2.11.1
+        with:
+          egress-policy: audit
+
       -
         name: Delete packages
-        uses: actions/delete-package-versions@v5
+        uses: actions/delete-package-versions@e5bc658cc4c965c472efe991f8beea3981499c55 # v5.0.0
         with:
           package-name: ${{ matrix.package }}
           package-type: 'container'
